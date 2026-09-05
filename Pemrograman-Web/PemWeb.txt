@@ -1,7 +1,0 @@
-
-CSS
-tag html : sesuai dgn 
-class : titik
-id: #
-
-style

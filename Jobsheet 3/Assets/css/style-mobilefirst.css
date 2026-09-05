@@ -30,21 +30,47 @@ header {
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
+    position: relative; /* dulu cuma aktif di mobile, sekarang default karena mobile-first */
 }
 
 header h1 {
     font-size: 1.4rem;
 }
 
+/* Default (mobile): nav vertikal, disembunyikan sampai hamburger diklik */
 header nav ul {
     list-style: none;
     display: flex;
-    gap: 1.25rem;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 header nav a {
     color: #fff;
     font-weight: 500;
+}
+
+header nav {
+    display: none;
+    width: 100%;
+    order: 3;
+    margin-top: 1rem;
+}
+
+/* ===== Hamburger Menu (checkbox hack) ===== */
+.nav-toggle {
+    display: none;
+}
+
+.nav-toggle-label {
+    display: block;   /* default: kelihatan di mobile */
+    font-size: 1.6rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+.nav-toggle:checked ~ nav {
+    display: block;
 }
 
 /* ===== Main Layout ===== */
@@ -68,9 +94,10 @@ section h2 {
 }
 
 /* ===== Kartu Statistik (CSS Grid) ===== */
+/* Default (mobile): 1 kolom */
 main section:nth-of-type(2) {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr;
     gap: 1rem;
 }
 
@@ -83,7 +110,7 @@ main section:nth-of-type(2) article {
     border-radius: 8px;
     padding: 1.25rem;
     text-align: center;
-   
+    min-width: 0;
 }
 
 main section:nth-of-type(2) article h3 {
@@ -159,10 +186,11 @@ form label {
     color: #444;
 }
 
+/* Default (mobile): input full width */
 form input,
 form select {
     width: 100%;
-    max-width: 400px;
+    max-width: 100%;
     padding: 0.55rem 0.7rem;
     border: 1px solid #cdd4da;
     border-radius: 4px;
@@ -196,67 +224,46 @@ footer {
     overflow-x: auto;
 }
 
-/* ===== Hamburger Menu (checkbox hack) ===== */
-.nav-toggle {
-    display: none;
-}
+/* ===== Responsive Breakpoints (Mobile-First) ===== */
 
-.nav-toggle-label {
-    display: none;
-    font-size: 1.6rem;
-    color: #fff;
-    cursor: pointer;
-}
-
-/* ===== Responsive Breakpoints ===== */
-
-/* Tablet ke bawah */
-@media (max-width: 900px) {
-    main section:nth-of-type(2) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Mobile */
-@media (max-width: 820px) {
-    header {
-        position: relative;
-    }
-
+/* Mulai lega dikit (tadinya "max-width: 820px" jadi batas bawah) */
+@media (min-width: 821px) {
     .nav-toggle-label {
-        display: block;
+        display: none;
     }
 
     header nav {
-        display: none;
-        width: 100%;
-        order: 3;
-        margin-top: 1rem;
-    }
-
-    .nav-toggle:checked ~ nav {
-        display: block;
+        display: block !important;
+        width: auto;
+        order: initial;
+        margin-top: 0;
     }
 
     header nav ul {
-        flex-direction: column;
-        gap: 0.75rem;
+        flex-direction: row;
+        gap: 1.25rem;
     }
 
     main section:nth-of-type(2) {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     form input,
     form select {
-        max-width: 100%;
+        max-width: 400px;
     }
+}
+
+/* Layar lega/tablet besar ke atas (tadinya "max-width: 900px") */
+@media (min-width: 901px) {
+    main section:nth-of-type(2) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
 
 /* Monitor sangat lebar */
 @media (min-width: 1400px) {
     main {
         max-width: 1300px;
     }
-}
-
 }

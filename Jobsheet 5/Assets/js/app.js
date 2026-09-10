@@ -18,6 +18,7 @@ function initHapusConfirm() {
             const yakin = confirm("Yakin ingin menghapus \"" + nama + "\"?");
             if (yakin && row) {
                 row.remove();
+                updateFilterCounter();
             }
         });
     });
@@ -33,10 +34,23 @@ function initTableFilter() {
         const keyword = input.value.toLowerCase();
         const rows = table.querySelectorAll("tbody tr");
         rows.forEach(function (row) {
-            const teks = row.textContent.toLowerCase();
+            const kolomJudul = row.querySelector("td");
+            const teks = kolomJudul ? kolomJudul.textContent.toLowerCase() : "";
             row.style.display = teks.includes(keyword) ? "" : "none";
         });
+
+        updateFilterCounter();
     });
+}
+
+function updateFilterCounter() {
+    const counter = document.getElementById("filter-counter");
+    const table = document.querySelector(".table-responsive table");
+    if (!counter || !table) return;
+
+    const semuaBaris = table.querySelectorAll("tbody tr");
+    const barisTampil = table.querySelectorAll("tbody tr:not([style*='display: none'])");
+    counter.textContent = "Menampilkan " + barisTampil.length + " dari " + semuaBaris.length + " buku";
 }
 
 // ===== Validasi form (client-side) =====
@@ -62,21 +76,22 @@ function initValidasiForm() {
     form.addEventListener("submit", function (e) {
         let valid = true;
 
-        const judul = form.querySelector("[name='judul'], [name='nama']");
-        if (judul && judul.value.trim() === "") {
-            tampilkanError(judul, "Field ini wajib diisi.");
-            valid = false;
-        } else if (judul) {
-            hapusError(judul);
-        }
+        const fieldWajibIsi = [
+            { nama: "judul", pesan: "Judul wajib diisi." },
+            { nama: "pengarang", pesan: "Pengarang wajib diisi." }
+        ];
 
-        const pengarang = form.querySelector("[name='pengarang']");
-        if (pengarang && pengarang.value.trim() === "") {
-            tampilkanError(pengarang, "Pengarang wajib diisi.");
-            valid = false;
-        } else if (pengarang) {
-            hapusError(pengarang);
-        }
+        fieldWajibIsi.forEach(function (item) {
+            const input = form.querySelector("[name='" + item.nama + "']");
+            if (input) {
+                if (input.value.trim() === "") {
+                    tampilkanError(input, item.pesan);
+                    valid = false;
+                } else {
+                    hapusError(input);
+                }
+            }
+        });
 
         const tahun = form.querySelector("[name='tahun']");
         if (tahun) {
@@ -100,6 +115,17 @@ function initValidasiForm() {
             }
         }
 
+        const isbn = form.querySelector("[name='isbn']");
+        if (isbn && isbn.value.trim() !== "") {
+            const polaIsbn = /^[0-9-]+$/;
+            if (!polaIsbn.test(isbn.value.trim())) {
+                tampilkanError(isbn, "ISBN hanya boleh berisi angka dan tanda hubung.");
+                valid = false;
+            } else {
+                hapusError(isbn);
+            }
+        }
+
         if (!valid) {
             e.preventDefault();
         }
@@ -111,4 +137,5 @@ document.addEventListener("DOMContentLoaded", function () {
     initHapusConfirm();
     initTableFilter();
     initValidasiForm();
+    updateFilterCounter();
 });

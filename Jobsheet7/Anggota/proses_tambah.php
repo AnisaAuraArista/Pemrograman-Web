@@ -1,55 +1,38 @@
 <?php
-$page_title = "Daftar Buku";
-include __DIR__ . '/../includes/header.php';
+session_start();
 
-$flash = $_SESSION['flash'] ?? null;
-unset($_SESSION['flash']);
-$daftarBuku = $_SESSION['buku'] ?? [];
-?>
-        <section>
-            <h2>Daftar Buku</h2>
+$nama = trim($_POST['nama'] ?? '');
+$noAnggota = trim($_POST['no_anggota'] ?? '');
+$alamat = trim($_POST['alamat'] ?? '');
+$noHp = trim($_POST['no_hp'] ?? '');
 
-            <?php if ($flash): ?>
-                <p class="flash flash-<?php echo $flash['type']; ?>"><?php echo $flash['pesan']; ?></p>
-            <?php endif; ?>
+$errors = [];
+if ($nama === '') {
+    $errors[] = "Nama wajib diisi.";
+}
+if ($noAnggota === '') {
+    $errors[] = "No. Anggota wajib diisi.";
+}
+if ($noHp !== '' && !preg_match('/^[0-9]+$/', $noHp)) {
+    $errors[] = "No. HP hanya boleh berisi angka.";
+}
+if (!empty($errors)) {
+    $_SESSION['flash'] = ['type' => 'error', 'pesan' => implode(' ', $errors)];
+    header('Location: tambah.php');
+    exit;
+}
 
-            <div class="search-box">
-                <label for="search-input">Cari Judul Buku</label>
-                <input type="text" id="search-input" placeholder="Ketik judul buku...">
-            </div>
+if (!isset($_SESSION['anggota'])) {
+    $_SESSION['anggota'] = [];
+}
 
-            <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Judul</th>
-                        <th>Pengarang</th>
-                        <th>Tahun</th>
-                        <th>Stok</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($daftarBuku)): ?>
-                    <tr>
-                        <td colspan="5">Belum ada data buku. Silakan tambah lewat menu "Tambah Buku".</td>
-                    </tr>
-                    <?php else: ?>
-                        <?php foreach ($daftarBuku as $buku): ?>
-                        <tr>
-                            <td><?php echo $buku['judul']; ?></td>
-                            <td><?php echo $buku['pengarang']; ?></td>
-                            <td><?php echo $buku['tahun']; ?></td>
-                            <td><?php echo $buku['stok']; ?></td>
-                            <td>
-                                <button type="button">Edit</button>
-                                <button type="button" class="btn-hapus">Hapus</button>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-            </div>
-        </section>
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+$_SESSION['anggota'][] = [
+    'nama' => $nama,
+    'no_anggota' => $noAnggota,
+    'alamat' => $alamat,
+    'no_hp' => $noHp,
+];
+
+$_SESSION['flash'] = ['type' => 'success', 'pesan' => 'Anggota berhasil ditambahkan.'];
+header('Location: list.php');
+exit;

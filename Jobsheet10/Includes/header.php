@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require __DIR__ . '/remember.php';
 $sudahLogin = isset($_SESSION['user_id']);
 
 // Prefix relatif ke root proyek ini (bukan root domain) — supaya

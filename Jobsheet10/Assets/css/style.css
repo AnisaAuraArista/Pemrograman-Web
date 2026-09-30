@@ -343,3 +343,12 @@ footer {
         max-width: 100%;
     }
 }
+.remember-me label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.remember-me input {
+    width: auto;
+}

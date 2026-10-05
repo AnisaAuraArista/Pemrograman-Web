@@ -33,7 +33,7 @@ $totalPages = max(1, (int) ceil($totalRows / $perPage));
             <h2>Daftar Buku</h2>
 
             <?php if ($flash): ?>
-                <p class="flash flash-<?php echo $flash['type']; ?>"><?php echo $flash['pesan']; ?></p>
+                <p class="flash flash-<?php echo $flash['type']; ?>"><?php echo e($flash['pesan']); ?></p>
             <?php endif; ?>
 
             <div class="search-box">

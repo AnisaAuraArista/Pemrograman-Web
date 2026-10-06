@@ -17,6 +17,19 @@ if ($anggotaId === '' || $bukuId === '') {
 try {
     $pdo->beginTransaction();
 
+    // Cek apakah anggota ini punya peminjaman aktif yang sudah terlambat >14 hari 
+    $cekTerlambat = $pdo->prepare(
+        "SELECT COUNT(*) FROM peminjaman
+         WHERE anggota_id = :anggota_id
+         AND status = 'dipinjam'
+         AND CURRENT_DATE - tanggal_pinjam > 14"
+    );
+    $cekTerlambat->execute(['anggota_id' => $anggotaId]);
+    if ($cekTerlambat->fetchColumn() > 0) {
+        throw new Exception('Anggota ini memiliki peminjaman terlambat lebih dari 14 hari.
+        Harap selesaikan dulu sebelum meminjam buku baru.');
+    }
+
     // Kunci baris buku (FOR UPDATE) agar stok tidak berubah oleh transaksi lain
     // di tengah proses ini — mencegah stok menjadi negatif akibat race condition.
     $cek = $pdo->prepare("SELECT stok FROM buku WHERE id = :id FOR UPDATE");
@@ -28,8 +41,8 @@ try {
     }
 
     $insert = $pdo->prepare(
-        "INSERT INTO peminjaman (buku_id, anggota_id, tanggal_pinjam, status)
-         VALUES (:buku_id, :anggota_id, CURRENT_DATE, 'dipinjam')"
+        "INSERT INTO peminjaman (buku_id, anggota_id, tanggal_pinjam, tanggal_jatuh_tempo, status)
+         VALUES (:buku_id, :anggota_id, CURRENT_DATE, CURRENT_DATE + INTERVAL '14 days', 'dipinjam')"
     );
     $insert->execute(['buku_id' => $bukuId, 'anggota_id' => $anggotaId]);
 
